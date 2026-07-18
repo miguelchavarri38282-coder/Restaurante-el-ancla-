@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Pagina web</title>
+    
+    <!-- Fuente Hacker Profesional -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Fondo Negro Absoluto */
+        body {
+            background: #000000;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Lluvia Matrix de Fondo */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.22;
+            pointer-events: none;
+        }
+
+        /* Tarjeta Hacker Oscura */
+        .card-container {
+            position: relative;
+            background: rgba(8, 8, 8, 0.92); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 0 35px rgba(255, 0, 60, 0.25);
+            max-width: 750px; /* AMPLIADO DE 480PX A 750PX */
+            width: 100%;
+            text-align: center;
+            border: 1px solid #ff003c;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .card-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 45px rgba(255, 0, 60, 0.5);
+            border-color: #ff3366;
+        }
+
+        /* Brillo de Fondo */
+        .glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 60, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            animation: rotateGlow 12s linear infinite;
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Avatar del Hacker con pulso */
+        .avatar {
+            font-size: 50px;
+            background: rgba(255, 0, 60, 0.1);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+            border: 2px solid #ff003c;
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.4);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 0, 60, 0.3); }
+            100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(255, 0, 60, 0.6); }
+        }
+
+        /* Nombre */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #ffffff, #ff003c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        /* Subtítulo Principal */
+        .subtitle {
+            font-size: 0.95rem;
+            color: #ff003c;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(255, 0, 60, 0.5);
+        }
+
+        /* Texto de biografía */
+        .profile-content p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        /* Habilidades */
+        .skills {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 0, 60, 0.05);
+            border: 1px solid rgba(255, 0, 60, 0.3);
+            color: #ff6688;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            background: #ff003c !important;
+            color: #000000 !important;
+            border-color: #ff003c !important;
+            box-shadow: 0 0 15px #ff003c !important;
+            transform: scale(1.08);
+        }
+
+        /* Sección Proyectos */
+        .projects-section {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 0, 60, 0.15);
+            padding: 15px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .project-card:hover {
+            background: rgba(255, 0, 60, 0.05);
+            border-color: #ff003c;
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .project-icon {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+        }
+
+        .project-card h3 {
+            font-size: 1rem;
+            color: #f8fafc;
+            margin-bottom: 4px;
+        }
+
+        .project-card p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            flex-grow: 1;
+        }
+
+        .project-link {
+            display: inline-block !important;
+            text-decoration: none !important;
+            padding: 8px 16px !important;
+            border-radius: 6px !important;
+            font-weight: bold !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 0.5px !important;
+            transition: all 0.3s ease !important;
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #ff003c, #99001e) !important;
+            box-shadow: 0 4px 10px rgba(255, 0, 60, 0.3) !important;
+            border: none !important;
+            margin-top: auto !important;
+        }
+
+        /* ------------------------------------------------------------- */
+        /* REDISEÑO MAJESTUOSO DEL SUBTÍTULO Y LA CONSOLA LINUX */
+        /* ------------------------------------------------------------- */
+        
+        /* Subtítulo Linux - Ultra Destacado */
+        .linux-section-title {
+            font-size: 1.4rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            margin-top: 35px;
+            margin-bottom: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-shadow: 0 0 12px #ff003c, 0 0 25px #ff003c;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 60, 0.15), transparent);
+            padding: 12px 10px;
+            border-top: 1px solid #ff003c;
+            border-bottom: 1px solid #ff003c;
+        }
+
+        /* Contenedor Linux Cyberpunk */
+        .linux-container {
+            background: #020202;
+            border: 2px solid #ff003c;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: left;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255, 0, 60, 0.35);
+            position: relative;
+        }
+
+        /* Efecto de líneas retro de monitor antiguo */
+        .linux-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+            z-index: 2;
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .linux-header {
+            background: #0a0a0a;
+            padding: 12px 16px;
+            border-bottom: 2px solid #ff003c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .linux-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-red { background: #ff003c; box-shadow: 0 0 8px #ff003c; }
+        .dot-yellow { background: #ffbd2e; box-shadow: 0 0 8px #ffbd2e; }
+        .dot-green { background: #27c93f; box-shadow: 0 0 8px #27c93f; }
+
+        .linux-title {
+            font-size: 0.85rem;
+            color: #ff3366;
+            margin-left: 8px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 5px rgba(255, 0, 60, 0.5);
+        }
+
+        .linux-body {
+            padding: 18px;
+            font-size: 0.9rem;
+            height: 350px; /* AMPLIADO DE 180PX A 350PX PARA DARLE EL DOBLE DE ALTURA */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .linux-output {
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-bottom: 12px;
+            color: #ff4d6d;
+            scroll-behavior: smooth;
+            text-shadow: 0 0 5px rgba(255, 0, 60, 0.3);
+        }
+
+        .linux-output::-webkit-scrollbar {
+            width: 4px;
+        }
+        .linux-output::-webkit-scrollbar-thumb {
+            background: #ff003c;
+            border-radius: 2px;
+        }
+
+        .linux-line {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        /* Fila de entrada basada en formulario para asegurar compatibilidad total de Enter */
+        .linux-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 0, 60, 0.3);
+            padding-top: 10px;
+            z-index: 3;
+            width: 100%;
+        }
+
+        .linux-prompt {
+            color: #ff003c;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(255, 0, 60, 0.6);
+            flex-shrink: 0; /* Previene que el prompt se achique */
+        }
+
+        .linux-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            outline: none;
+            flex-grow: 1;
+            width: 100%; /* Asegura consistencia */
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            caret-color: #ff003c; /* Cursor */
+        }
+
+        /* NUEVO BOTÓN DE ENVIAR ROBUSTO Y REDISEÑADO */
+        .linux-send-btn {
+            background: linear-gradient(135deg, #ff003c, #99001e);
+            border: 1px solid #ff3366;
+            color: #ffffff;
+            padding: 6px 15px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.4);
+            flex-shrink: 0; /* IMPIDE que el botón se aplaste o se recorte */
+        }
+
+        .linux-send-btn:active {
+            transform: scale(0.95);
+            background: #ff003c;
+            box-shadow: 0 0 15px #ff003c;
+        }
+
+        /* Pie de página */
+        .profile-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        /* Botones principales */
+        .btn {
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ff003c, #99001e);
+            box-shadow: 0 4px 15px rgba(255, 0, 60, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 0, 60, 0.7);
+        }
+
+        .btn-alt {
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            background: transparent;
+            border: 1px solid #ff003c;
+            color: #ff003c;
+            box-shadow: none;
+        }
+
+        .btn-alt:hover {
+            background: rgba(255, 0, 15, 0.1);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Lluvia Matrix detrás -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <main class="card-container">
+        <div class="glow"></div>
+        
+        <header class="profile-header">
+            <div class="avatar">👹💻</div>
+            <h1>miguelxiter1</h1>
+            <p class="subtitle">Ingeniería de Sistemas</p>
+        </header>
+
+        <section class="profile-content">
+            <p>Apasionado por el desarrollo de software, la ciberseguridad y la tecnología de vanguardia. Actualmente construyendo entornos en Python y explorando el ecosistema web.</p>
+            
+            <div class="skills">
+                <span class="badge">Python</span>
+                <span class="badge">HTML, CSS, JavaScript</span>
+                <span class="badge">Cybersec</span>
+                <span class="badge">Linux</span>
+            </div>
+        </section>
+
+        <!-- Proyectos -->
+        <section class="projects-section">
+            <div class="projects-grid">
+                
+                <div class="project-card">
+                    <div class="project-icon">🐍</div>
+                    <h3>Cyber Decoy</h3>
+                    <p>Un señuelo interactivo desarrollado en Python.</p>
+                    <a href="#" class="project-link">Ver Código</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-icon">🛡️</div>
+                    <h3>Próximamente</h3>
+                    <p>Nuevo software de seguridad en desarrollo...</p>
+                    <a href="#" class="project-link">Saber más</a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SUBTÍTULO LINUX REDISEÑADO -->
+        <div class="linux-section-title">--- LINUX ---</div>
+
+        <!-- 📟 SECCIÓN LINUX CON SOPORTE DE FORMULARIO COMPLETO -->
+        <section class="linux-container">
+            <div class="linux-header">
+                <span class="linux-dot dot-red"></span>
+                <span class="linux-dot dot-yellow"></span>
+                <span class="linux-dot dot-green"></span>
+                <span class="linux-title">root@linux_sys:~# bash</span>
+            </div>
+            <div class="linux-body">
+                <div class="linux-output" id="linuxOutput">
+                    <div class="linux-line">> Linux Kernel 6.12 activo...</div>
+                    <div class="linux-line">> Escribe "help" para ver las palabras clave del sistema.</div>
+                </div>
+                
+                <!-- El Formulario asegura compatibilidad total con el botón Enter de móviles y físicos -->
+                <form id="linuxForm" class="linux-input-row" action="">
+                    <span class="linux-prompt">linux_sys#</span>
+                    <input type="text" id="linuxInput" class="linux-input" placeholder="Ingresa un comando..." autocomplete="off">
+                    <button type="submit" class="linux-send-btn" id="linuxSendBtn">EJECUTAR</button>
+                </form>
+            </div>
+        </section>
+
+        <footer class="profile-footer">
+            <a href="https://www.tiktok.com/@miguelxiter1" target="_blank" rel="noopener noreferrer" class="btn">Mi Tiktok</a>
+            <a href="https://wa.me/50589343467" target="_blank" class="btn btn-alt">Mi WhatsApp</a>
+        </footer>
+    </main>
+
+    <script>
+        // -------------------------------------------------------------
+        // 1. ANIMACIÓN DE LA LLUVIA MATRIX (ROJA)
+        // -------------------------------------------------------------
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const letters = "0101010101LINUXKERNELSYSTEMSHACKERSECURITYXITER1";
+        const fontSize = 12;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#ff003c";
+            ctx.font = fontSize + "px 'Share Tech Mono'";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 45);
+
+
+        // -------------------------------------------------------------
+        // 2. LÓGICA DE LA CONSOLA LINUX MEJORADA (SOPORTE ENTER COMPLETO)
+        // -------------------------------------------------------------
+        const linuxForm = document.getElementById('linuxForm');
+        const linuxInput = document.getElementById('linuxInput');
+        const linuxOutput = document.getElementById('linuxOutput');
+
+        function printLine(text, isResponse = true) {
+            const line = document.createElement('div');
+            line.className = 'linux-line';
+            line.innerHTML = isResponse ? `> ${text}` : text;
+            linuxOutput.appendChild(line);
+            linuxOutput.scrollTop = linuxOutput.scrollHeight;
+        }
+
+        // Procesar ejecución de comandos
+        function executeCommand() {
+            const command = linuxInput.value.trim().toLowerCase();
+            if (command === '') return;
+            
+            printLine(`<span style="color: #ffffff;">linux_sys# ${linuxInput.value}</span>`, false);
+            processCommand(command);
+            linuxInput.value = ''; // Limpiar campo
+        }
+
+        // El evento SUBMIT intercepta tanto la pulsación del botón como cualquier "Enter" de teclado
+        linuxForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Previene recarga de página por defecto
+            executeCommand();
+        });
+
+        function processCommand(cmd) {
+            switch(cmd) {
+                case 'help':
+                    printLine("PALABRAS CLAVE DEL SISTEMA:");
+                    printLine("  help     - Muestra este panel de ayuda.");
+                    printLine("  hack     - Simulación de intrusión activa.");
+                    printLine("  proj
